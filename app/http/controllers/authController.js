@@ -3,6 +3,9 @@ const User = require('../../models/user');
 const bcrypt = require('bcrypt');
 
 function authController() {
+    const _getRedirectUrl = (req) => {
+        return req.user.role === 'admin' ? '/admin/orders' : '/customer/orders'
+    }
     // Factory functions
     return {
         // CRUD 
@@ -31,7 +34,8 @@ function authController() {
                         req.flash('error', info.message)
                         return next(err)
                     }
-                    return res.redirect('/')
+
+                    return res.redirect(_getRedirectUrl(req))
 
                 })
             })(req, res, next)
@@ -40,50 +44,52 @@ function authController() {
             res.render('auth/register');
         },
         async postRegister(req, res) {
-            const { name, email, password } = req.body;
-
-            try {
-                // Validate the request
-                if (!name || !email || !password) {
-                    req.flash('error', 'All fields are required');
-                    req.flash('name', name);
-                    req.flash('email', email);
-                    return res.redirect('/register');
-                }
-
-                // Check if email exists
-                const emailExists = await User.exists({ email: email });
-                if (emailExists) {
-                    req.flash('error', 'Email already registered');
-                    req.flash('name', name);
-                    req.flash('email', email);
-                    return res.redirect('/register');
-                }
-
-                // Hash password
-                const hashedPassword = await bcrypt.hash(password, 10);
-
-                // Create a User
-                const user = new User({
-                    name,
-                    email,
-                    password: hashedPassword
-                });
-
-                await user.save();
-                // Login
-                return res.redirect('/');
-            } catch (error) {
-                console.error(error);
-                req.flash('error', 'Something went wrong');
-                return res.redirect('/register');
+            const { name, email, password } = req.body
+            // Validate request 
+            if (!name || !email || !password) {
+                req.flash('error', 'All fields are required')
+                req.flash('name', name)
+                req.flash('email', email)
+                return res.redirect('/register')
             }
+
+            // Check if email exists 
+            User.exists({ email: email }, (err, result) => {
+                if (result) {
+                    req.flash('error', 'Email already taken')
+                    req.flash('name', name)
+                    req.flash('email', email)
+                    return res.redirect('/register')
+                }
+            })
+
+            // Hash password 
+            const hashedPassword = await bcrypt.hash(password, 10)
+            // Create a user 
+            const user = new User({
+                name,
+                email,
+                password: hashedPassword
+            })
+
+            user.save().then((user) => {
+                // Login
+                return res.redirect('/')
+            }).catch(err => {
+                req.flash('error', 'Something went wrong')
+                return res.redirect('/register')
+            })
         },
         logout(req, res) {
-            req.logout()
-            return res.redirect('/login')
+            req.logout((err) => {
+                if (err) {
+                    console.error(err);
+                    return res.redirect('/'); // Handle the error appropriately
+                }
+                return res.redirect('/login'); // Redirect after logout
+            });
         }
-    }
+    };
 }
 
 module.exports = authController
