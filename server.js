@@ -4,7 +4,7 @@ const app = express();
 const ejs = require('ejs');
 const path = require('path');
 const expressLayout = require('express-ejs-layouts');
-const PORT = process.env.PORT || 3300;
+const PORT = process.env.PORT || 4000;
 const mongoose = require('mongoose');
 const session = require('express-session');
 const flash = require('express-flash');
@@ -13,10 +13,8 @@ const passport = require('passport')
 const Emitter = require('events')
 
 // Database connection
-const url = 'mongodb://127.0.0.1:27017/pizza';
-
 const connection = mongoose.connection;
-mongoose.connect(url, {
+mongoose.connect(process.env.MONGO_CONNECTION_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
@@ -72,6 +70,9 @@ app.set('views', path.join(__dirname, '/resources/views'));
 app.set('view engine', 'ejs');
 
 require('./routes/web')(app)
+app.use((req,res) => {
+    res.status(404).render('errors/404')
+})
 
 const server = app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
