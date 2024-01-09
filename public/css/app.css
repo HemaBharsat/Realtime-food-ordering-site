@@ -272,7 +272,7 @@ section.hero {
   transition: all 0.3s ease-in-out;
 }
 .add-to-cart:hover {
-  background: #b23301;
+  background: #FE5F1E;
   border-color: #fff;
   color: #fff;
 }
@@ -306,7 +306,7 @@ section.login a:hover {
   color: #b23301;
 }
 
-.noty_theme_mint {
+.noty_theme__mint {
   border-radius: 50px !important;
   padding-left: 8px !important;
 }
@@ -317,7 +317,7 @@ a.link {
 
 section.status {
   background: #F8F8F8;
-  min-height: 14vh;
+  min-height: calc(100vh - 86px);
 }
 
 .status-box {
@@ -400,7 +400,7 @@ section.status {
   background: #ccc;
 }
 
-.status-box ul li.step-completed:after {
+.status-box ul li.step-completed span:after {
   background: #ccc;
 }
 
@@ -436,4 +436,28 @@ section.status {
   .status-box ul li span:before {
     font-size: 34px;
   }
+}
+.StripeElement {
+  box-sizing: border-box;
+  width: 50%;
+  margin-left: auto;
+  height: 40px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 1px 3px 0 #e6ebf1;
+  transition: box-shadow 150ms ease;
+}
+
+.StripeElement--focus {
+  box-shadow: 0 1px 3px 0 #cfd7df;
+}
+
+.StripeElement--invalid {
+  border-color: #fa755a;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
 }

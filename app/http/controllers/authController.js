@@ -1,25 +1,22 @@
-const passport = require('passport');
-const User = require('../../models/user');
-const bcrypt = require('bcrypt');
-
+const User = require('../../models/user')
+const bcrypt = require('bcrypt')
+const passport = require('passport')
 function authController() {
     const _getRedirectUrl = (req) => {
         return req.user.role === 'admin' ? '/admin/orders' : '/customer/orders'
     }
-    // Factory functions
+
     return {
-        // CRUD 
         login(req, res) {
-            res.render('auth/login');
+            res.render('auth/login')
         },
         postLogin(req, res, next) {
             const { email, password } = req.body
-            // Validate the request
+            // Validate request 
             if (!email || !password) {
-                req.flash('error', 'All fields are required');
-                return res.redirect('/login');
+                req.flash('error', 'All fields are required')
+                return res.redirect('/login')
             }
-
             passport.authenticate('local', (err, user, info) => {
                 if (err) {
                     req.flash('error', info.message)
@@ -36,12 +33,11 @@ function authController() {
                     }
 
                     return res.redirect(_getRedirectUrl(req))
-
                 })
             })(req, res, next)
         },
         register(req, res) {
-            res.render('auth/register');
+            res.render('auth/register')
         },
         async postRegister(req, res) {
             const { name, email, password } = req.body
@@ -83,12 +79,12 @@ function authController() {
         logout(req, res) {
             req.logout((err) => {
                 if (err) {
-                    console.error(err);
-                    return res.redirect('/'); // Handle the error appropriately
+                    req.flash('error', 'Error logging out');
+                    return res.redirect('/');
                 }
-                return res.redirect('/login'); // Redirect after logout
+                return res.redirect('/login');
             });
-        }
+        },
     };
 }
 
